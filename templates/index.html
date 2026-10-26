@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>FIT/SCAN — Career Accelerator</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#10141B;--panel:#1A2029;--raised:#212836;--line:#2A3240;--lineb:#3A4456;--txt:#EDEFF3;--muted:#8B93A3;--dim:#5B6472;--amber:#F2A93B;--green:#4FD8AE;--red:#EF6B5C;--blue:#6FA8FF;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;}
+a{color:var(--blue);text-decoration:none;}a:hover{text-decoration:underline;}
+.shell{display:flex;flex-direction:column;min-height:100vh;}
+.topbar{border-bottom:1px solid var(--line);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:50px;flex-shrink:0;}
+.logo{font-family:var(--mono);font-weight:700;font-size:17px;}.logo span{color:var(--amber);}
+.user-bar{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:11px;color:var(--muted);}
+.body{display:flex;flex:1;overflow:hidden;}
+.sidebar{width:196px;flex-shrink:0;border-right:1px solid var(--line);padding:14px 0;display:flex;flex-direction:column;}
+.nav{display:flex;align-items:center;gap:9px;padding:9px 14px;cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--muted);border-left:2px solid transparent;}
+.nav:hover{color:var(--txt);background:var(--panel);}
+.nav.active{color:var(--amber);border-left-color:var(--amber);background:var(--panel);}
+.nav-icon{width:15px;text-align:center;font-size:12px;}
+.content{flex:1;overflow-y:auto;padding:26px 28px 60px;}
+@media(max-width:700px){.sidebar{display:none;}.content{padding:16px 14px 60px;}}
+.tab-page{display:none;}.tab-page.active{display:block;}
+.eyebrow{font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;}
+h2{font-weight:600;font-size:20px;margin-bottom:5px;}
+.sub{color:var(--muted);font-size:13px;line-height:1.55;max-width:560px;margin-bottom:20px;}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px 18px;margin-bottom:12px;}
+.lbl{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.mode-toggle{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:3px;width:fit-content;margin-bottom:16px;}
+.mbtn{font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;background:transparent;border:none;color:var(--muted);padding:7px 13px;border-radius:3px;cursor:pointer;}
+.mbtn.active{background:var(--amber);color:#1A1204;}
+.btn{font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.03em;background:var(--amber);color:#1A1204;border:none;border-radius:5px;padding:10px 17px;cursor:pointer;text-transform:uppercase;}
+.btn:hover:not(:disabled){opacity:.88;transform:translateY(-1px);}
+.btn:disabled{opacity:.38;cursor:not-allowed;}
+.btn-ghost{background:transparent;border:1px solid var(--lineb);color:var(--muted);font-family:var(--mono);font-size:11px;padding:8px 13px;border-radius:5px;cursor:pointer;}
+.btn-ghost:hover{color:var(--txt);border-color:var(--muted);}
+.btn-danger{background:transparent;border:1px solid rgba(239,107,92,.35);color:var(--red);font-family:var(--mono);font-size:10px;padding:5px 9px;border-radius:4px;cursor:pointer;}
+.btn-danger:hover{background:rgba(239,107,92,.08);}
+.btn-blue{background:rgba(111,168,255,.12);border:1px solid rgba(111,168,255,.3);color:var(--blue);font-family:var(--mono);font-size:10px;padding:5px 9px;border-radius:4px;cursor:pointer;text-decoration:none;display:inline-block;}
+.dz{border:1.5px dashed var(--lineb);border-radius:6px;background:var(--panel);padding:26px 16px;text-align:center;cursor:pointer;margin-bottom:12px;}
+.dz:hover,.dz.drag{border-color:var(--amber);background:var(--raised);}
+.dz-icon{font-size:20px;color:var(--amber);margin-bottom:6px;}
+.dz-txt{font-size:13px;margin-bottom:3px;}.dz-sub{font-family:var(--mono);font-size:10.5px;color:var(--dim);}
+#fileInput{display:none;}
+.file-row{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:10px 13px;display:none;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;}
+.file-row.show{display:flex;}
+.fname{font-family:var(--mono);font-size:12px;color:var(--green);}
+.fmeta{font-family:var(--mono);font-size:9.5px;color:var(--dim);margin-top:1px;}
+textarea{background:var(--raised);border:1px solid var(--line);border-radius:5px;color:var(--txt);font-family:var(--sans);font-size:13px;line-height:1.55;padding:10px;width:100%;resize:vertical;outline:none;min-height:160px;}
+textarea:focus{border-color:var(--lineb);}
+textarea::placeholder{color:var(--dim);}
+.banner{font-family:var(--mono);font-size:11.5px;padding:8px 11px;border-radius:5px;margin-top:10px;display:none;}
+.banner.err{background:rgba(239,107,92,.1);color:var(--red);border:1px solid rgba(239,107,92,.3);display:block;}
+.banner.info{background:rgba(111,168,255,.08);color:var(--blue);border:1px solid rgba(111,168,255,.2);display:block;}
+.banner.ok{background:rgba(79,216,174,.07);color:var(--green);border:1px solid rgba(79,216,174,.2);display:block;}
+.scan-wrap{display:none;text-align:center;padding:36px 16px;background:var(--panel);border:1px solid var(--line);border-radius:6px;margin-top:14px;}
+.sdoc{width:80px;height:104px;margin:0 auto 16px;position:relative;background:var(--raised);border:1px solid var(--lineb);border-radius:4px;overflow:hidden;}
+.sln{height:4px;background:var(--lineb);border-radius:2px;margin:7px 10px;}
+.sln:nth-child(3){width:55%;}
+.scanline{position:absolute;left:0;right:0;height:2px;background:var(--amber);box-shadow:0 0 9px 2px var(--amber);animation:sweep 1.4s ease-in-out infinite;}
+@keyframes sweep{0%{top:0;opacity:.3}50%{opacity:1}100%{top:100%;opacity:.3}}
+.stxt{font-family:var(--mono);font-size:11.5px;color:var(--muted);}
+.cur{color:var(--amber);}
+.rpt-wrap{margin-top:16px;display:none;}
+.divider{display:flex;align-items:center;gap:8px;margin:24px 0 18px;color:var(--dim);}
+.divider::before,.divider::after{content:'';flex:1;border-top:1px dashed var(--lineb);}
+.divider span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;}
+.rpt-head{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;margin-bottom:20px;}
+.gauge{width:108px;height:108px;position:relative;flex-shrink:0;}
+.gauge svg{transform:rotate(-90deg);}
+.gi{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.gn{font-family:var(--mono);font-weight:700;font-size:26px;line-height:1;}
+.gl{font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-top:1px;}
+.verdict{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:4px;border:1.5px solid;display:inline-block;margin-top:6px;}
+.v-s{color:var(--green);border-color:var(--green);background:rgba(79,216,174,.08);}
+.v-m{color:var(--amber);border-color:var(--amber);background:rgba(242,169,59,.08);}
+.v-w{color:var(--red);border-color:var(--red);background:rgba(239,107,92,.08);}
+.sb{flex:1;min-width:200px;}
+.sb p{font-size:13.5px;line-height:1.6;}
+.bkdn{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+@media(max-width:540px){.bkdn{grid-template-columns:1fr;}}
+.bdc{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:10px 12px;}
+.bdr{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:5px;text-transform:uppercase;}
+.bdr span:last-child{color:var(--txt);font-weight:600;}
+.bar-track{height:4px;background:var(--line);border-radius:2px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:2px;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.chip{font-family:var(--mono);font-size:10.5px;padding:4px 8px;border-radius:3px;border:1px solid;}
+.cg{color:var(--green);border-color:rgba(79,216,174,.3);background:rgba(79,216,174,.06);}
+.cr{color:var(--red);border-color:rgba(239,107,92,.3);background:rgba(239,107,92,.06);}
+.issue-card{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--red);border-radius:4px;padding:11px 13px;margin-bottom:8px;}
+.it{font-family:var(--mono);font-weight:600;font-size:11px;color:var(--red);text-transform:uppercase;margin-bottom:3px;}
+.id{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:6px;}
+.ifix{font-size:12px;line-height:1.5;padding-left:8px;border-left:2px solid var(--amber);}
+.ifix b{color:var(--amber);font-family:var(--mono);font-size:9px;text-transform:uppercase;display:block;margin-bottom:2px;}
+.si{display:flex;gap:9px;padding:9px 0;border-top:1px solid var(--line);font-size:12.5px;line-height:1.5;}
+.si:last-child{border-bottom:1px solid var(--line);}
+.sn{font-family:var(--mono);color:var(--amber);font-weight:700;flex-shrink:0;}
+.role-card{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:10px 13px;margin-bottom:7px;}
+.rt{font-family:var(--mono);font-weight:600;font-size:12px;color:var(--blue);margin-bottom:2px;}
+.rr{font-size:11.5px;color:var(--muted);line-height:1.5;}
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);padding:6px 9px;border-bottom:1px solid var(--line);text-align:left;}
+.tbl td{font-size:12px;padding:9px 9px;border-bottom:1px solid var(--line);vertical-align:middle;}
+.tbl tr:hover td{background:var(--raised);cursor:pointer;}
+.sbadge{font-family:var(--mono);font-weight:700;font-size:12px;padding:2px 7px;border-radius:3px;}
+.sh{color:var(--green);background:rgba(79,216,174,.1);}
+.sm{color:var(--amber);background:rgba(242,169,59,.1);}
+.sl{color:var(--red);background:rgba(239,107,92,.1);}
+.mb{font-family:var(--mono);font-size:9.5px;padding:2px 5px;border-radius:3px;border:1px solid;text-transform:uppercase;}
+.mbg{color:var(--blue);border-color:rgba(111,168,255,.3);}
+.mbm{color:var(--amber);border-color:rgba(242,169,59,.3);}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
+select.fsel{background:var(--panel);border:1px solid var(--line);color:var(--txt);font-family:var(--mono);font-size:11px;padding:6px 10px;border-radius:5px;outline:none;}
+.jobs-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+@media(max-width:660px){.jobs-grid{grid-template-columns:1fr;}}
+.jcard{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:13px 15px;display:flex;flex-direction:column;gap:7px;}
+.jcard:hover{border-color:var(--lineb);}
+.jtop{display:flex;justify-content:space-between;align-items:flex-start;gap:7px;}
+.jtitle{font-weight:600;font-size:13px;line-height:1.3;}
+.jco{font-size:11.5px;color:var(--muted);margin-top:1px;}
+.jloc{font-family:var(--mono);font-size:10px;color:var(--dim);}
+.jsrc{font-family:var(--mono);font-size:9px;color:var(--dim);background:var(--raised);padding:2px 5px;border-radius:3px;white-space:nowrap;flex-shrink:0;}
+.jchips{display:flex;flex-wrap:wrap;gap:4px;}
+.jchip{font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:3px;background:rgba(79,216,174,.06);color:var(--green);border:1px solid rgba(79,216,174,.16);}
+.jfoot{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;}
+.mpct{font-family:var(--mono);font-size:11px;font-weight:700;}
+.jactions{display:flex;gap:5px;align-items:center;}
+.apply-btn{font-family:var(--mono);font-size:10px;font-weight:700;background:var(--amber);color:#1A1204;padding:5px 10px;border-radius:3px;text-decoration:none;text-transform:uppercase;}
+.apply-btn:hover{text-decoration:none;opacity:.88;}
+.contact-row{font-family:var(--mono);font-size:10px;color:var(--dim);display:flex;gap:8px;flex-wrap:wrap;}
+.contact-row a{color:var(--blue);font-size:10px;}
+.status-sel{background:var(--raised);border:1px solid var(--lineb);color:var(--txt);font-family:var(--mono);font-size:10px;padding:4px 7px;border-radius:4px;outline:none;cursor:pointer;}
+.empty{padding:40px 16px;text-align:center;color:var(--dim);font-family:var(--mono);font-size:11.5px;}
+.refresh-bar{display:flex;align-items:center;gap:9px;padding:8px 12px;background:var(--panel);border:1px solid var(--line);border-radius:5px;margin-bottom:13px;font-family:var(--mono);font-size:11px;color:var(--muted);}
+.rdot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.spinner{display:inline-block;width:11px;height:11px;border:2px solid var(--lineb);border-top-color:var(--amber);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:4px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rsel{background:var(--panel);border:1px solid var(--line);color:var(--txt);font-family:var(--mono);font-size:11.5px;padding:8px 11px;border-radius:5px;outline:none;width:100%;max-width:420px;margin-bottom:16px;}
+/* Interview */
+.qcard{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin-bottom:10px;}
+.qnum{font-family:var(--mono);font-size:10px;color:var(--amber);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+.qtxt{font-size:13.5px;line-height:1.5;margin-bottom:10px;font-weight:500;}
+.qscore{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:3px;}
+.qs-high{color:var(--green);background:rgba(79,216,174,.1);}
+.qs-mid{color:var(--amber);background:rgba(242,169,59,.1);}
+.qs-low{color:var(--red);background:rgba(239,107,92,.1);}
+.ev-card{background:var(--raised);border:1px solid var(--lineb);border-radius:4px;padding:10px 12px;margin-top:8px;}
+.ev-fb{font-size:12.5px;color:var(--muted);line-height:1.5;margin-bottom:6px;}
+.ev-model{font-size:12px;line-height:1.5;padding-left:8px;border-left:2px solid var(--green);color:var(--txt);}
+.ev-model b{color:var(--green);font-family:var(--mono);font-size:9.5px;display:block;margin-bottom:2px;}
+.iv-report{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:20px 22px;margin-top:16px;}
+.grade-badge{font-family:var(--mono);font-weight:700;font-size:28px;width:60px;height:60px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.grade-A{background:rgba(79,216,174,.12);color:var(--green);border:2px solid var(--green);}
+.grade-B{background:rgba(111,168,255,.12);color:var(--blue);border:2px solid var(--blue);}
+.grade-C{background:rgba(242,169,59,.12);color:var(--amber);border:2px solid var(--amber);}
+.grade-D,.grade-F{background:rgba(239,107,92,.12);color:var(--red);border:2px solid var(--red);}
+/* Tracker */
+.status-badge{font-family:var(--mono);font-size:9.5px;padding:3px 7px;border-radius:3px;text-transform:uppercase;font-weight:600;}
+.st-applied{color:var(--blue);background:rgba(111,168,255,.1);border:1px solid rgba(111,168,255,.3);}
+.st-pending{color:var(--amber);background:rgba(242,169,59,.1);border:1px solid rgba(242,169,59,.3);}
+.st-interview{color:var(--green);background:rgba(79,216,174,.1);border:1px solid rgba(79,216,174,.3);}
+.st-rejected{color:var(--red);background:rgba(239,107,92,.1);border:1px solid rgba(239,107,92,.3);}
+.st-offer{color:#B9F;background:rgba(187,153,255,.1);border:1px solid rgba(187,153,255,.3);}
+/* Tailor */
+.tailor-diff{background:var(--raised);border:1px solid var(--lineb);border-radius:5px;padding:14px;font-family:var(--mono);font-size:12px;color:var(--txt);white-space:pre-wrap;max-height:300px;overflow-y:auto;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="logo">FIT<span>/</span>SCAN</div>
+    <div class="user-bar">
+      <span id="userGreet">Loading…</span>
+      <button class="btn-ghost" style="padding:5px 10px;font-size:10px;" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+  <div class="body">
+    <nav class="sidebar">
+      <div class="nav active" data-tab="upload"><span class="nav-icon">↥</span>Upload Resume</div>
+      <div class="nav" data-tab="scan"><span class="nav-icon">⬡</span>ATS Scanner</div>
+      <div class="nav" data-tab="tailor"><span class="nav-icon">✦</span>Tailor Resume</div>
+      <div class="nav" data-tab="jobs"><span class="nav-icon">⚑</span>Job Matches</div>
+      <div class="nav" data-tab="tracker"><span class="nav-icon">◈</span>Application Tracker</div>
+      <div class="nav" data-tab="interview"><span class="nav-icon">◎</span>AI Interview</div>
+      <div class="nav" data-tab="history"><span class="nav-icon">◷</span>History</div>
+    </nav>
+    <main class="content">
+
+<!-- ══ UPLOAD ══════════════════════════════════════════════════════════════ -->
+<div class="tab-page active" id="tab-upload">
+  <div class="eyebrow">Step 01</div><h2>Upload Your Resume</h2>
+  <p class="sub">Upload a PDF, DOCX, or TXT resume. We extract your skills and instantly search for high-match jobs (50%+ match) worldwide.</p>
+  <div class="dz" id="dz"><div class="dz-icon">↥</div><div class="dz-txt">Drop resume here or click to upload</div><div class="dz-sub">PDF · DOCX · TXT · Max 8 MB</div></div>
+  <input type="file" id="fileInput" accept=".pdf,.docx,.txt"/>
+  <div class="file-row" id="fileRow"><div><div class="fname" id="fName">—</div><div class="fmeta" id="fMeta">—</div></div><button class="btn-ghost" onclick="resetFile()">Replace</button></div>
+  <div style="display:flex;gap:8px;"><button class="btn" id="uploadBtn" disabled>Upload &amp; Find Jobs</button></div>
+  <div class="banner" id="upErr"></div><div class="banner" id="upOk"></div>
+  <div style="margin-top:26px;"><div class="eyebrow" style="margin-bottom:10px;">Your Resumes</div><div id="resumeList"><div class="empty">No resumes yet.</div></div></div>
+</div>
+
+<!-- ══ SCANNER ═════════════════════════════════════════════════════════════ -->
+<div class="tab-page" id="tab-scan">
+  <div class="eyebrow">Step 02</div><h2>ATS Scanner</h2>
+  <p class="sub">General ATS health check (no JD needed) or match scan against a job description. All rule-based — instant results.</p>
+  <div class="lbl">Select Resume</div>
+  <select class="rsel" id="scanRes"><option value="">— upload a resume first —</option></select>
+  <div class="mode-toggle">
+    <button class="mbtn active" id="btnG" onclick="setMode('g')">General ATS Check</button>
+    <button class="mbtn" id="btnM" onclick="setMode('m')">Match to Job</button>
+  </div>
+  <div id="jdWrap" style="display:none;margin-bottom:14px;"><div class="lbl">Job Description</div><textarea id="jdInput" placeholder="Paste the full job description here..."></textarea></div>
+  <button class="btn" id="scanBtn" disabled>Run ATS Check</button>
+  <div class="banner" id="scanErr"></div>
+  <div class="scan-wrap" id="scanWrap"><div class="sdoc"><div class="sln"></div><div class="sln"></div><div class="sln"></div><div class="sln"></div><div class="scanline"></div></div><div class="stxt" id="stxt">Analysing<span class="cur">_</span></div></div>
+  <div class="rpt-wrap" id="rptWrap"></div>
+</div>
+
+<!-- ══ TAILOR ══════════════════════════════════════════════════════════════ -->
+<div class="tab-page" id="tab-tailor">
+  <div class="eyebrow">Step 03</div><h2>Tailor Resume to Job</h2>
+  <p class="sub">Paste a job description and we'll tell you exactly what keywords and skills to add, what passive phrases to replace, and generate a tailored version of your resume with a higher match score.</p>
+  <div class="lbl">Select Resume</div>
+  <select class="rsel" id="tailorRes"><option value="">— upload a resume first —</option></select>
+  <div class="lbl">Job Description</div>
+  <textarea id="tailorJD" placeholder="Paste the job description you want to tailor your resume for..." style="min-height:180px;margin-bottom:14px;"></textarea>
+  <button class="btn" id="tailorBtn" disabled>Tailor My Resume</button>
+  <div class="banner" id="tailorErr"></div>
+  <div id="tailorResult" style="display:none;margin-top:18px;"></div>
+</div>
+
+<!-- ══ JOBS ════════════════════════════════════════════════════════════════ -->
+<div class="tab-page" id="tab-jobs">
+  <div class="eyebrow">Daily Refresh</div><h2>Job Matches</h2>
+  <p class="sub">Real jobs from RemoteOK, Arbeitnow, Jobicy, The Muse &amp; Remotive — only 50%+ matches shown. Click Apply to go directly to the application page. HR contacts shown for follow-up.</p>
+  <div class="lbl">Resume</div>
+  <select class="rsel" id="jobRes"><option value="">— select a resume —</option></select>
+  <div class="filter-row">
+    <select class="fsel" id="jobSort"><option value="score">Best Match</option><option value="date">Newest</option></select>
+    <button class="btn-ghost" id="refreshBtn">↻ Refresh Now</button>
+  </div>
+  <div class="refresh-bar" id="refreshBar" style="display:none;"><div class="rdot"></div><span id="refreshTxt">—</span></div>
+  <div id="jobsWrap"><div class="empty">Select a resume to see matched jobs.</div></div>
+</div>
+
+<!-- ══ TRACKER ═════════════════════════════════════════════════════════════ -->
+<div class="tab-page" id="tab-tracker">
+  <div class="eyebrow">Applications</div><h2>Application Tracker</h2>
+  <p class="sub">Track every job you've applied to. Update status, see HR contacts for follow-up, and never lose track of an application.</p>
+  <div id="trackerWrap"><div class="empty">No applications yet. Apply to jobs from the Job Matches tab.</div></div>
+</div>
+
+<!-- ══ INTERVIEW ═══════════════════════════════════════════════════════════ -->
+<div class="tab-page" id="tab-interview">
+  <div class="eyebrow">AI Proctored</div><h2>AI Interview</h2>
+  <p class="sub">Strict AI interviewer — half questions from the job description, half from a technical question bank. Get scored per answer, with model answers and a final performance report.</p>
+  <div id="ivSetup">
+    <div class="lbl">Resume (optional)</div>
+    <select class="rsel" id="ivRes"><option value="">— optional: helps personalise questions —</option></select>
+    <div class="lbl">Job Title</div>
+    <input type="text" id="ivTitle" placeholder="e.g. Senior Python Developer" style="background:var(--raised);border:1px solid var(--line);border-radius:5px;color:var(--txt);font-family:var(--sans);font-size:13px;padding:10px;width:100%;outline:none;margin-bottom:12px;"/>
+    <div class="lbl">Job Description</div>
+    <textarea id="ivJD" placeholder="Paste the full job description here..." style="min-height:160px;margin-bottom:14px;"></textarea>
+    <button class="btn" id="ivStartBtn">Start Interview</button>
+    <div class="banner" id="ivErr"></div>
+  </div>
+  <div id="ivSession" style="display:none;"></div>
+  <div style="margin-top:32px;border-top:1px solid var(--line);padding-top:20px;">
+    <div class="eyebrow" style="margin-bottom:12px;">Interview History</div>
+    <div id="ivHistory"><div class="empty">No interviews taken yet.</div></div>
+  </div>
+</div>
+
+<!-- ══ HISTORY ═════════════════════════════════════════════════════════════ -->
+<div class="tab-page" id="tab-history">
+  <div class="eyebrow">Records</div><h2>Scan History</h2>
+  <p class="sub">All ATS scans saved to your account. Click any row to view the full report.</p>
+  <div id="histWrap"><div class="empty">No scans yet.</div></div>
+</div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;overflow-y:auto;padding:26px 14px;">
+  <div style="max-width:700px;margin:0 auto;"><div style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:22px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><span class="eyebrow" style="margin:0;">Detail</span><button class="btn-ghost" onclick="closeModal()">✕ Close</button></div>
+    <div id="modalBody"></div>
+  </div></div>
+</div>
+
+<script>
+// ── auth guard ────────────────────────────────────────────────────────────
+(async()=>{
+  const d=await fetch('/api/auth/me').then(r=>r.json()).catch(()=>({authenticated:false}));
+  if(!d.authenticated){window.location.href='/login';return;}
+  document.getElementById('userGreet').textContent='Hi, '+d.user.name;
+})();
+
+async function doLogout(){
+  await fetch('/api/auth/logout',{method:'POST'});
+  window.location.href='/login';
+}
+
+// ── nav ───────────────────────────────────────────────────────────────────
+document.querySelectorAll('.nav').forEach(el=>{
+  el.addEventListener('click',()=>{
+    document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));
+    document.querySelectorAll('.tab-page').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tab-'+el.dataset.tab).classList.add('active');
+    if(el.dataset.tab==='history') loadHistory();
+    if(el.dataset.tab==='upload') loadResumes();
+    if(el.dataset.tab==='tracker') loadTracker();
+    if(el.dataset.tab==='interview') loadIvHistory();
+    if(el.dataset.tab==='scan'||el.dataset.tab==='tailor'||el.dataset.tab==='jobs'||el.dataset.tab==='interview') popSelects();
+  });
+});
+
+// ── helpers ───────────────────────────────────────────────────────────────
+const gc=s=>s>=75?'#4FD8AE':s>=50?'#F2A93B':'#EF6B5C';
+const sb=s=>s>=75?'sh':s>=50?'sm':'sl';
+const vc=v=>/strong|ready|excellent/i.test(v)?'v-s':/moderate|minor/i.test(v)?'v-m':'v-w';
+function gsvg(sc,col){const r=46,c=2*Math.PI*r,off=c-(sc/100)*c;return`<svg width="108" height="108" viewBox="0 0 108 108"><circle cx="54" cy="54" r="${r}" fill="none" stroke="#2A3240" stroke-width="8"/><circle cx="54" cy="54" r="${r}" fill="none" stroke="${col}" stroke-width="8" stroke-dasharray="${c}" stroke-dashoffset="${off}" stroke-linecap="round"/></svg>`;}
+function showB(id,msg,t='err'){const e=document.getElementById(id);e.textContent=msg;e.className='banner '+t;}
+function hideB(id){document.getElementById(id).className='banner';}
+async function api(path,opts={}){const r=await fetch(path,opts);const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);return d;}
+function closeModal(){document.getElementById('modal').style.display='none';}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
+
+// ── file upload ───────────────────────────────────────────────────────────
+let curFile=null;
+const dz=document.getElementById('dz'),fi=document.getElementById('fileInput');
+dz.addEventListener('click',()=>fi.click());
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');if(e.dataTransfer.files.length)setFile(e.dataTransfer.files[0]);});
+fi.addEventListener('change',e=>{if(e.target.files.length)setFile(e.target.files[0]);});
+function resetFile(){curFile=null;document.getElementById('fileRow').classList.remove('show');dz.style.display='';document.getElementById('uploadBtn').disabled=true;fi.value='';}
+function setFile(f){const ext=f.name.split('.').pop().toLowerCase();if(!['pdf','docx','txt'].includes(ext)){showB('upErr','Upload PDF, DOCX, or TXT only.');return;}hideB('upErr');curFile=f;dz.style.display='none';document.getElementById('fileRow').classList.add('show');document.getElementById('fName').textContent=f.name;document.getElementById('fMeta').textContent=(f.size/1024).toFixed(1)+' KB';document.getElementById('uploadBtn').disabled=false;}
+
+document.getElementById('uploadBtn').addEventListener('click',async()=>{
+  if(!curFile)return;
+  document.getElementById('uploadBtn').disabled=true;
+  hideB('upErr');hideB('upOk');
+  showB('upOk','⟳ Uploading and finding jobs…','info');
+  const fd=new FormData();fd.append('file',curFile);
+  try{const d=await api('/api/upload',{method:'POST',body:fd});showB('upOk',`✓ Uploaded "${d.filename}" — ${d.word_count} words, ${d.skills.length} skills. Searching jobs…`,'ok');loadResumes();popSelects();}
+  catch(e){showB('upErr',e.message);}
+  finally{document.getElementById('uploadBtn').disabled=false;}
+});
+
+async function loadResumes(){
+  const w=document.getElementById('resumeList');
+  const data=await api('/api/resumes').catch(()=>[]);
+  if(!data.length){w.innerHTML='<div class="empty">No resumes yet.</div>';return;}
+  w.innerHTML=data.map(r=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+    <div><div style="font-weight:600;font-size:13px;margin-bottom:2px;">${r.filename}</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--dim);">${r.word_count} words · ${r.scan_count} scans · ${r.job_count} jobs · ${r.created_at}</div>
+    ${r.skills.length?`<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">${r.skills.map(s=>`<span class="chip cg">${s}</span>`).join('')}</div>`:''}</div>
+    <div style="display:flex;gap:5px;">
+      <button class="btn-ghost" onclick="goJobs(${r.id})">Jobs</button>
+      <button class="btn-danger" onclick="delRes(${r.id})">Delete</button>
+    </div></div>`).join('');
+}
+async function delRes(id){if(!confirm('Delete resume and all its data?'))return;await api(`/api/resumes/${id}`,{method:'DELETE'});loadResumes();popSelects();}
+function goJobs(id){document.querySelector('[data-tab="jobs"]').click();setTimeout(()=>{document.getElementById('jobRes').value=id;loadJobs(id);},200);}
+
+async function popSelects(){
+  const data=await api('/api/resumes').catch(()=>[]);
+  const opts=data.length?'<option value="">— select —</option>'+data.map(r=>`<option value="${r.id}">${r.filename}</option>`).join(''):'<option value="">— upload a resume first —</option>';
+  ['scanRes','jobRes','tailorRes','ivRes'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=opts;});
+  document.getElementById('scanBtn').disabled=!data.length;
+  document.getElementById('tailorBtn').disabled=!data.length;
+}
+
+// ── scanner ───────────────────────────────────────────────────────────────
+let scanMode='g';
+function setMode(m){scanMode=m;document.getElementById('btnG').classList.toggle('active',m==='g');document.getElementById('btnM').classList.toggle('active',m==='m');document.getElementById('jdWrap').style.display=m==='m'?'block':'none';document.getElementById('scanBtn').textContent=m==='g'?'Run ATS Check':'Run Match Scan';}
+document.getElementById('scanRes').addEventListener('change',e=>{document.getElementById('scanBtn').disabled=!e.target.value;});
+const smsgs={g:['Parsing resume','Checking sections','Scanning achievements','Evaluating keywords','Checking formatting','Computing score'],m:['Parsing resume','Extracting skills','Cross-referencing JD','Scoring overlap','Analysing experience','Computing verdict']};
+let sint;
+function startS(){let i=0,m=smsgs[scanMode];document.getElementById('stxt').innerHTML=m[0]+'<span class="cur">_</span>';sint=setInterval(()=>{i=(i+1)%m.length;document.getElementById('stxt').innerHTML=m[i]+'<span class="cur">_</span>';},850);}
+function stopS(){clearInterval(sint);}
+
+document.getElementById('scanBtn').addEventListener('click',async()=>{
+  const rid=document.getElementById('scanRes').value;
+  if(!rid){showB('scanErr','Select a resume.');return;}
+  if(scanMode==='m'&&!document.getElementById('jdInput').value.trim()){showB('scanErr','Paste a job description.');return;}
+  hideB('scanErr');document.getElementById('scanBtn').disabled=true;document.getElementById('rptWrap').style.display='none';document.getElementById('scanWrap').style.display='block';startS();
+  try{
+    const url=scanMode==='g'?'/api/scan/general':'/api/scan/match';
+    const body={resume_id:parseInt(rid)};
+    if(scanMode==='m')body.jd_text=document.getElementById('jdInput').value.trim();
+    const d=await api(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    stopS();document.getElementById('scanWrap').style.display='none';
+    renderReport(d.result,document.getElementById('rptWrap'));
+    document.getElementById('rptWrap').style.display='block';
+  }catch(e){stopS();document.getElementById('scanWrap').style.display='none';showB('scanErr',e.message);}
+  finally{document.getElementById('scanBtn').disabled=false;}
+});
+
+function renderReport(result,container){
+  const sc=result.atsScore||0,col=gc(sc),vc_=vc(result.verdict||''),isG=!!result.issues;
+  const bd=result.breakdown||{};
+  const bdi=isG?[['Structure',bd.structureFormatting],['Content',bd.contentQuality],['Keywords',bd.keywordOptimization],['Readability',bd.readabilityLength]]:[['Keywords',bd.keywordMatch],['Skills',bd.skillsMatch],['Experience',bd.experienceMatch],['Format',bd.formatCompliance]];
+  const bdH=`<div class="bkdn">${bdi.map(([l,v])=>{const p=v||0;return`<div class="bdc"><div class="bdr"><span>${l}</span><span>${p}%</span></div><div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${gc(p)}"></div></div></div>`;}).join('')}</div>`;
+  let skillsH='';
+  if(isG){const s=(result.strengths||[]).map(s=>`<span class="chip cg">${s}</span>`).join('')||'<span style="color:var(--dim);font-family:var(--mono);font-size:11px;">None</span>';skillsH=`<div class="lbl" style="color:var(--green);margin-bottom:6px;">Strengths</div><div class="chips">${s}</div>`;}
+  else{const m=(result.matchedSkills||[]).map(s=>`<span class="chip cg">${s}</span>`).join('')||'<span style="color:var(--dim);font-family:var(--mono);font-size:11px;">None</span>';const ms=(result.missingSkills||[]).map(s=>`<span class="chip cr">${s}</span>`).join('')||'<span style="color:var(--dim);font-family:var(--mono);font-size:11px;">None</span>';skillsH=`<div class="lbl" style="color:var(--green);margin-bottom:6px;">Matched</div><div class="chips">${m}</div><div class="lbl" style="color:var(--red);margin-bottom:6px;margin-top:12px;">Missing</div><div class="chips">${ms}</div>`;}
+  let botH='';
+  if(isG){const iss=(result.issues||[]).map(i=>`<div class="issue-card"><div class="it">${i.title}</div><div class="id">${i.detail}</div><div class="ifix"><b>Fix</b>${i.fix}</div></div>`).join('');botH=`<div class="lbl" style="margin-bottom:10px;">Where You're Losing Points</div>${iss||'<div style="color:var(--dim);font-family:var(--mono);font-size:11px;">No major issues.</div>'}`;}
+  else{const ss=(result.suggestions||[]).map((s,i)=>`<div class="si"><span class="sn">0${i+1}</span><span>${s}</span></div>`).join('');const rs=(result.alternativeRoles||[]).map(r=>`<div class="role-card"><div class="rt">${r.role}</div><div class="rr">${r.reason}</div></div>`).join('');botH=(ss?`<div class="lbl" style="margin-bottom:10px;">Recommendations</div>${ss}`:'')+( rs?`<div class="lbl" style="margin-top:16px;margin-bottom:10px;">Alternative Roles</div>${rs}`:'');}
+  container.innerHTML=`<div class="divider"><span>${isG?'ATS Health Report':'Fit Scan Report'}</span></div><div class="rpt-head"><div style="text-align:center;flex-shrink:0;"><div class="gauge">${gsvg(sc,col)}<div class="gi"><div class="gn" style="color:${col}">${sc}</div><div class="gl">ATS Score</div></div></div><div class="verdict ${vc_}" style="margin-top:6px;">${result.verdict||''}</div></div><div class="sb"><div class="lbl">Assessment</div><p>${result.summary||''}</p></div></div>${bdH}<div style="margin-top:16px;">${skillsH}</div><div style="margin-top:16px;">${botH}</div>`;
+}
+
+// ── tailor ────────────────────────────────────────────────────────────────
+document.getElementById('tailorRes').addEventListener('change',e=>{document.getElementById('tailorBtn').disabled=!e.target.value;});
+document.getElementById('tailorBtn').addEventListener('click',async()=>{
+  const rid=document.getElementById('tailorRes').value;
+  const jd=document.getElementById('tailorJD').value.trim();
+  if(!rid){showB('tailorErr','Select a resume.');return;}
+  if(!jd){showB('tailorErr','Paste a job description.');return;}
+  hideB('tailorErr');document.getElementById('tailorBtn').disabled=true;document.getElementById('tailorBtn').textContent='Tailoring…';
+  try{
+    const d=await api('/api/tailor',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_id:parseInt(rid),jd_text:jd})});
+    const w=document.getElementById('tailorResult');
+    w.style.display='block';
+    const scoreChange=d.tailored_score-d.original_score;
+    const sc=scoreChange>=0?`<span style="color:var(--green)">+${scoreChange}</span>`:`<span style="color:var(--red)">${scoreChange}</span>`;
+    w.innerHTML=`<div class="divider"><span>Tailoring Report</span></div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:18px;">
+      <div class="card" style="flex:1;min-width:160px;text-align:center;"><div class="lbl">Original Score</div><div style="font-family:var(--mono);font-weight:700;font-size:28px;color:${gc(d.original_score)}">${d.original_score}</div></div>
+      <div class="card" style="flex:1;min-width:160px;text-align:center;"><div class="lbl">Tailored Score</div><div style="font-family:var(--mono);font-weight:700;font-size:28px;color:${gc(d.tailored_score)}">${d.tailored_score} ${sc}</div></div>
+    </div>
+    ${d.suggestions.length?`<div class="lbl" style="margin-bottom:10px;">What to Change</div>${d.suggestions.map((s,i)=>`<div class="si"><span class="sn">0${i+1}</span><span>${s}</span></div>`).join('')}`:''}
+    <div class="lbl" style="margin-top:18px;margin-bottom:8px;">Tailored Resume Preview <span style="color:var(--dim);font-size:10px;">(copy and apply these changes)</span></div>
+    <div class="tailor-diff">${d.tailored_text.replace(/</g,'&lt;').replace(/\[REPLACE/g,'<span style="background:rgba(242,169,59,.2);color:var(--amber);">[REPLACE').replace(/\]/g,']</span>')}</div>`;
+  }catch(e){showB('tailorErr',e.message);}
+  finally{document.getElementById('tailorBtn').disabled=false;document.getElementById('tailorBtn').textContent='Tailor My Resume';}
+});
+
+// ── jobs ──────────────────────────────────────────────────────────────────
+document.getElementById('jobRes').addEventListener('change',e=>{if(e.target.value)loadJobs(e.target.value);});
+document.getElementById('jobSort').addEventListener('change',()=>{const id=document.getElementById('jobRes').value;if(id)loadJobs(id);});
+document.getElementById('refreshBtn').addEventListener('click',async()=>{
+  const id=document.getElementById('jobRes').value;
+  if(!id){alert('Select a resume first.');return;}
+  const btn=document.getElementById('refreshBtn');btn.disabled=true;btn.textContent='↻ Refreshing…';
+  try{await api(`/api/refresh/${id}`,{method:'POST'});loadJobs(id);}
+  catch(e){alert('Refresh failed: '+e.message);}
+  finally{btn.disabled=false;btn.textContent='↻ Refresh Now';}
+});
+
+async function loadJobs(rid){
+  const w=document.getElementById('jobsWrap'),sort=document.getElementById('jobSort').value;
+  w.innerHTML='<div class="empty"><span class="spinner"></span>Loading jobs…</div>';
+  try{
+    const d=await api(`/api/jobs/${rid}?sort=${sort}`);
+    document.getElementById('refreshBar').style.display='flex';
+    document.getElementById('refreshTxt').textContent=`${d.total} high-match jobs for "${d.resume_filename}" · ${d.last_refreshed}`;
+    if(!d.jobs.length){w.innerHTML='<div class="empty">No 50%+ match jobs yet. Click ↻ Refresh Now to search live listings.</div>';return;}
+    w.innerHTML=`<div class="jobs-grid">${d.jobs.map(j=>{
+      const col=gc(j.match_score);
+      const chips=j.matched_skills.slice(0,5).map(s=>`<span class="jchip">${s}</span>`).join('');
+      const applied=j.application_status!=='not_applied';
+      const statusBadge=applied?`<span class="status-badge st-${j.application_status}">${j.application_status}</span>`:'';
+      const contactRow=(j.hr_email||j.hr_linkedin)?`<div class="contact-row">
+        ${j.hr_email?`<span>📧 <a href="mailto:${j.hr_email}">${j.hr_email}</a></span>`:''}
+        ${j.hr_linkedin?`<span>🔗 <a href="${j.hr_linkedin}" target="_blank">LinkedIn Jobs</a></span>`:''}
+      </div>`:'';
+      return`<div class="jcard">
+        <div class="jtop"><div><div class="jtitle">${j.title}</div><div class="jco">${j.company}</div><div class="jloc" style="margin-top:2px;">📍 ${j.location} · ${j.posted_at}</div></div><span class="jsrc">${j.source}</span></div>
+        ${chips?`<div class="jchips">${chips}</div>`:''}
+        ${contactRow}
+        <div class="jfoot">
+          <span class="mpct" style="color:${col}">${j.match_score}% match</span>
+          <div class="jactions">
+            ${statusBadge}
+            <a class="apply-btn" href="${j.url}" target="_blank" rel="noopener" onclick="markApplied(${j.id})">Apply →</a>
+          </div>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  }catch(e){w.innerHTML=`<div class="empty">Failed: ${e.message}</div>`;}
+}
+
+async function markApplied(jobId){
+  try{await api('/api/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({job_id:jobId})});}
+  catch(e){}
+}
+
+// ── tracker ───────────────────────────────────────────────────────────────
+async function loadTracker(){
+  const w=document.getElementById('trackerWrap');
+  w.innerHTML='<div class="empty"><span class="spinner"></span>Loading…</div>';
+  const data=await api('/api/applications').catch(()=>[]);
+  if(!data.length){w.innerHTML='<div class="empty">No applications yet. Apply to jobs from the Job Matches tab.</div>';return;}
+  w.innerHTML=`<table class="tbl"><thead><tr><th>Company/Role</th><th>Status</th><th>Applied</th><th>Follow-up</th><th>HR Contact</th><th></th></tr></thead><tbody>${
+    data.map(a=>`<tr>
+      <td><div style="font-weight:600;font-size:12.5px;">${a.title}</div><div style="color:var(--muted);font-size:11.5px;">${a.company}</div></td>
+      <td><select class="status-sel" onchange="updateStatus(${a.id},this.value)">
+        ${['applied','pending','interview','rejected','offer'].map(s=>`<option value="${s}"${a.status===s?' selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+      </select></td>
+      <td style="font-family:var(--mono);font-size:10.5px;color:var(--dim);">${a.applied_at}</td>
+      <td style="font-family:var(--mono);font-size:10.5px;color:var(--amber);">${a.follow_up_at||'—'}</td>
+      <td>${a.hr_email?`<a href="mailto:${a.hr_email}" style="font-family:var(--mono);font-size:10px;">📧 ${a.hr_email}</a>`:'<span style="color:var(--dim);font-size:10.5px;">—</span>'}</td>
+      <td><a class="btn-blue" href="${a.url}" target="_blank">View Job</a></td>
+    </tr>`).join('')
+  }</tbody></table>`;
+}
+
+async function updateStatus(id,status){
+  await api(`/api/applications/${id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})}).catch(()=>{});
+}
+
+// ── interview ─────────────────────────────────────────────────────────────
+document.getElementById('ivStartBtn').addEventListener('click',async()=>{
+  const title=document.getElementById('ivTitle').value.trim();
+  const jd=document.getElementById('ivJD').value.trim();
+  const rid=document.getElementById('ivRes').value;
+  if(!title||!jd){showB('ivErr','Job title and description are required.');return;}
+  hideB('ivErr');
+  document.getElementById('ivStartBtn').disabled=true;
+  document.getElementById('ivStartBtn').textContent='Generating questions…';
+  try{
+    const d=await api('/api/interview/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({job_title:title,jd_text:jd,resume_id:rid?parseInt(rid):null})});
+    document.getElementById('ivSetup').style.display='none';
+    renderIvSession(d);
+  }catch(e){showB('ivErr',e.message);}
+  finally{document.getElementById('ivStartBtn').disabled=false;document.getElementById('ivStartBtn').textContent='Start Interview';}
+});
+
+function renderIvSession(d){
+  const w=document.getElementById('ivSession');
+  w.style.display='block';
+  const qhtml=d.questions.map((q,i)=>`<div class="qcard">
+    <div class="qnum">Question ${i+1} of ${d.questions.length}</div>
+    <div class="qtxt">${q}</div>
+    <textarea id="ans_${i}" placeholder="Type your answer here… Be detailed and specific." style="min-height:120px;margin-bottom:0;"></textarea>
+  </div>`).join('');
+  w.innerHTML=`<div class="divider"><span>Interview: ${d.job_title}</span></div>
+  <div style="background:rgba(239,107,92,.08);border:1px solid rgba(239,107,92,.25);border-radius:5px;padding:10px 13px;font-family:var(--mono);font-size:11px;color:var(--red);margin-bottom:16px;">⚠ This is a proctored AI interview. Answer each question as you would in a real interview. Skipping or brief answers will be scored strictly.</div>
+  ${qhtml}
+  <div style="margin-top:16px;display:flex;gap:10px;align-items:center;">
+    <button class="btn" id="ivSubmitBtn">Submit Interview</button>
+    <span style="font-family:var(--mono);font-size:10.5px;color:var(--dim);">Evaluating takes ~30 seconds</span>
+  </div>
+  <div class="banner" id="ivSubmitErr"></div>`;
+  document.getElementById('ivSubmitBtn').addEventListener('click',async()=>{
+    const answers=d.questions.map((_,i)=>document.getElementById(`ans_${i}`).value.trim());
+    const empty=answers.filter(a=>!a).length;
+    if(empty>0&&!confirm(`${empty} question(s) unanswered. Submit anyway? Empty answers score 0.`))return;
+    document.getElementById('ivSubmitBtn').disabled=true;
+    document.getElementById('ivSubmitBtn').textContent='Evaluating…';
+    try{
+      const res=await api(`/api/interview/${d.interview_id}/submit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({answers})});
+      renderIvResult(d.questions,answers,res.evaluations,res.report,w);
+      loadIvHistory();
+    }catch(e){showB('ivSubmitErr',e.message);document.getElementById('ivSubmitBtn').disabled=false;document.getElementById('ivSubmitBtn').textContent='Submit Interview';}
+  });
+}
+
+function renderIvResult(questions,answers,evals,report,container){
+  const grade=report.overall_grade||'C';
+  const gradeClass=`grade-${grade}`;
+  const qahtml=questions.map((q,i)=>{
+    const ev=evals[i]||{};const sc=ev.score||0;
+    const scClass=sc>=7?'qs-high':sc>=4?'qs-mid':'qs-low';
+    const wk=(ev.weaknesses||[]).map(w=>`<li>${w}</li>`).join('');
+    const st=(ev.strengths||[]).map(s=>`<li>${s}</li>`).join('');
+    return`<div class="qcard">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;">
+        <div class="qnum">Q${i+1}</div><span class="qscore ${scClass}">${sc}/10</span>
+      </div>
+      <div class="qtxt">${q}</div>
+      <div style="background:var(--raised);border:1px solid var(--lineb);border-radius:4px;padding:9px;font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5;"><b style="color:var(--dim);font-family:var(--mono);font-size:9.5px;text-transform:uppercase;display:block;margin-bottom:3px;">Your Answer</b>${answers[i]||'<i>No answer provided</i>'}</div>
+      <div class="ev-card">
+        <div class="ev-fb">${ev.feedback||'No feedback.'}</div>
+        ${st?`<div style="margin-bottom:6px;"><span style="font-family:var(--mono);font-size:9.5px;color:var(--green);text-transform:uppercase;">Strengths:</span><ul style="margin-top:3px;padding-left:16px;font-size:12px;color:var(--muted);line-height:1.6;">${st}</ul></div>`:''}
+        ${wk?`<div style="margin-bottom:6px;"><span style="font-family:var(--mono);font-size:9.5px;color:var(--red);text-transform:uppercase;">Gaps:</span><ul style="margin-top:3px;padding-left:16px;font-size:12px;color:var(--red);line-height:1.6;">${wk}</ul></div>`:''}
+        ${ev.model_answer?`<div class="ev-model"><b>Model Answer</b>${ev.model_answer}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  container.innerHTML=`<div class="divider"><span>Interview Report</span></div>
+  <div class="iv-report">
+    <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px;">
+      <div class="${gradeClass} grade-badge">${grade}</div>
+      <div style="flex:1;min-width:200px;">
+        <div style="font-weight:600;font-size:16px;margin-bottom:4px;">${report.readiness||'Review results'}</div>
+        <div style="font-size:13px;line-height:1.55;color:var(--muted);">${report.executive_summary||''}</div>
+        <div style="margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--amber);">Overall: ${report.overall_score||0}% · Avg: ${report.avg_per_question||0}/10 per question</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;flex-wrap:wrap;">
+      <div>
+        <div class="lbl" style="color:var(--green);margin-bottom:8px;">Top Strengths</div>
+        ${(report.top_strengths||[]).map(s=>`<div style="font-size:12.5px;padding:5px 0;border-bottom:1px solid var(--line);line-height:1.4;">✓ ${s}</div>`).join('')||'<div style="color:var(--dim);font-family:var(--mono);font-size:11px;">—</div>'}
+      </div>
+      <div>
+        <div class="lbl" style="color:var(--red);margin-bottom:8px;">Critical Gaps</div>
+        ${(report.critical_gaps||[]).map(g=>`<div style="font-size:12.5px;padding:5px 0;border-bottom:1px solid var(--line);color:var(--red);line-height:1.4;">✗ ${g}</div>`).join('')||'<div style="color:var(--dim);font-family:var(--mono);font-size:11px;">—</div>'}
+      </div>
+    </div>
+    ${(report.study_plan||[]).length?`<div style="margin-top:16px;"><div class="lbl" style="margin-bottom:8px;">Study Plan Before Real Interview</div>${report.study_plan.map((t,i)=>`<div class="si"><span class="sn">0${i+1}</span><span>${t}</span></div>`).join('')}</div>`:''}
+  </div>
+  <div style="margin-top:20px;"><div class="lbl" style="margin-bottom:12px;">Per-Question Breakdown</div>${qahtml}</div>
+  <div style="margin-top:16px;"><button class="btn-ghost" onclick="resetIv()">Start New Interview</button></div>`;
+}
+
+function resetIv(){document.getElementById('ivSession').style.display='none';document.getElementById('ivSession').innerHTML='';document.getElementById('ivSetup').style.display='block';}
+
+async function loadIvHistory(){
+  const w=document.getElementById('ivHistory');
+  const data=await api('/api/interview/history').catch(()=>[]);
+  if(!data.length){w.innerHTML='<div class="empty">No interviews yet.</div>';return;}
+  w.innerHTML=`<table class="tbl"><thead><tr><th>Role</th><th>Score</th><th>Status</th><th>Date</th><th></th></tr></thead><tbody>${
+    data.map(iv=>`<tr>
+      <td style="font-size:12.5px;font-weight:500;">${iv.job_title}</td>
+      <td><span class="sbadge ${sb(iv.overall_score||0)}">${iv.overall_score||0}%</span></td>
+      <td><span class="mb ${iv.status==='completed'?'mbg':'mbm'}">${iv.status}</span></td>
+      <td style="font-family:var(--mono);font-size:10.5px;color:var(--dim);">${iv.created_at}</td>
+      <td><button class="btn-ghost" style="font-size:10px;padding:5px 9px;" onclick="viewIv(${iv.id})">View</button></td>
+    </tr>`).join('')
+  }</tbody></table>`;
+}
+
+async function viewIv(id){
+  const d=await api(`/api/interview/${id}`).catch(()=>null);
+  if(!d)return;
+  const b=document.getElementById('modalBody');
+  b.innerHTML='';
+  if(d.evaluation&&d.evaluation.report){
+    renderIvResult(d.questions,d.answers,d.evaluation.evaluations||[],d.evaluation.report,b);
+  } else {
+    b.innerHTML=`<div class="empty">Interview pending or no report available.</div>`;
+  }
+  document.getElementById('modal').style.display='block';
+}
+
+// ── history ───────────────────────────────────────────────────────────────
+async function loadHistory(){
+  const w=document.getElementById('histWrap');
+  w.innerHTML='<div class="empty"><span class="spinner"></span>Loading…</div>';
+  const data=await api('/api/history').catch(()=>[]);
+  if(!data.length){w.innerHTML='<div class="empty">No scans yet.</div>';return;}
+  w.innerHTML=`<table class="tbl"><thead><tr><th>Date</th><th>Resume</th><th>Mode</th><th>Score</th><th>Verdict</th><th></th></tr></thead><tbody>${
+    data.map(s=>`<tr onclick="viewScan(${s.id})">
+      <td style="font-family:var(--mono);font-size:10px;color:var(--dim);white-space:nowrap;">${s.created_at}</td>
+      <td style="font-size:12px;color:var(--muted);">${s.resume_filename||'—'}</td>
+      <td><span class="mb ${s.mode==='general'?'mbg':'mbm'}">${s.mode}</span></td>
+      <td><span class="sbadge ${sb(s.ats_score||0)}">${s.ats_score||0}</span></td>
+      <td style="font-size:12px;max-width:150px;">${s.verdict||'—'}</td>
+      <td><button class="btn-danger" onclick="event.stopPropagation();delScan(${s.id})">✕</button></td>
+    </tr>`).join('')
+  }</tbody></table>`;
+}
+
+async function viewScan(id){
+  const d=await api(`/api/history/${id}`).catch(()=>null);
+  if(!d)return;
+  const b=document.getElementById('modalBody');
+  b.innerHTML=`<div style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-bottom:6px;">${d.created_at} · ${d.resume_filename} · <span class="mb ${d.mode==='general'?'mbg':'mbm'}">${d.mode}</span></div>`;
+  const rd=document.createElement('div');b.appendChild(rd);
+  renderReport(d.result,rd);
+  document.getElementById('modal').style.display='block';
+}
+
+async function delScan(id){if(!confirm('Delete this scan?'))return;await api(`/api/history/${id}`,{method:'DELETE'});loadHistory();}
+
+// ── init ──────────────────────────────────────────────────────────────────
+loadResumes();popSelects();
+</script>
+</body>
+</html>

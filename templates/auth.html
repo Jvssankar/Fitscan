@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>FIT/SCAN — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#10141B;--panel:#1A2029;--raised:#212836;--line:#2A3240;--lineb:#3A4456;--txt:#EDEFF3;--muted:#8B93A3;--dim:#5B6472;--amber:#F2A93B;--green:#4FD8AE;--red:#EF6B5C;--blue:#6FA8FF;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+.logo{font-family:var(--mono);font-weight:700;font-size:22px;margin-bottom:8px;}.logo span{color:var(--amber);}
+.tagline{font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:32px;}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:32px 28px;width:100%;max-width:400px;}
+.tabs{display:flex;background:var(--raised);border:1px solid var(--line);border-radius:6px;padding:3px;margin-bottom:26px;}
+.tab{flex:1;font-family:var(--mono);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;background:transparent;border:none;color:var(--muted);padding:9px;border-radius:4px;cursor:pointer;transition:all .12s;}
+.tab.active{background:var(--amber);color:#1A1204;}
+.field-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+input{background:var(--raised);border:1px solid var(--line);border-radius:5px;color:var(--txt);font-family:var(--sans);font-size:13.5px;padding:11px 13px;width:100%;outline:none;margin-bottom:14px;}
+input:focus{border-color:var(--lineb);}
+input::placeholder{color:var(--dim);}
+.btn{font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.03em;background:var(--amber);color:#1A1204;border:none;border-radius:5px;padding:12px;cursor:pointer;text-transform:uppercase;width:100%;margin-top:4px;transition:transform .12s,box-shadow .12s;}
+.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 14px rgba(242,169,59,.22);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.banner{font-family:var(--mono);font-size:12px;padding:9px 12px;border-radius:5px;margin-top:12px;display:none;}
+.banner.err{background:rgba(239,107,92,.1);color:var(--red);border:1px solid rgba(239,107,92,.3);display:block;}
+.banner.ok{background:rgba(79,216,174,.08);color:var(--green);border:1px solid rgba(79,216,174,.2);display:block;}
+.form-sec{display:none;}.form-sec.active{display:block;}
+.rule{text-align:center;font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:18px;}
+.rule a{color:var(--blue);cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="logo">FIT<span>/</span>SCAN</div>
+<div class="tagline">Resume ATS &amp; Career Accelerator</div>
+
+<div class="card">
+  <div class="tabs">
+    <button class="tab active" id="tabSignin" onclick="showTab('signin')">Sign In</button>
+    <button class="tab" id="tabSignup" onclick="showTab('signup')">Create Account</button>
+  </div>
+
+  <!-- Sign In -->
+  <div class="form-sec active" id="secSignin">
+    <div class="field-lbl">Email</div>
+    <input type="email" id="siEmail" placeholder="you@email.com" autocomplete="email"/>
+    <div class="field-lbl">Password</div>
+    <input type="password" id="siPw" placeholder="••••••••" autocomplete="current-password"/>
+    <button class="btn" id="siBtn" onclick="doSignin()">Sign In</button>
+    <div class="banner" id="siErr"></div>
+  </div>
+
+  <!-- Sign Up -->
+  <div class="form-sec" id="secSignup">
+    <div class="field-lbl">Full Name</div>
+    <input type="text" id="suName" placeholder="Your full name"/>
+    <div class="field-lbl">Email</div>
+    <input type="email" id="suEmail" placeholder="you@email.com" autocomplete="email"/>
+    <div class="field-lbl">Password <span style="color:var(--dim)">(min 6 chars)</span></div>
+    <input type="password" id="suPw" placeholder="••••••••" autocomplete="new-password"/>
+    <button class="btn" id="suBtn" onclick="doSignup()">Create Account</button>
+    <div class="banner" id="suErr"></div>
+  </div>
+</div>
+
+<script>
+const isRegister = window.location.pathname === '/register';
+if(isRegister) showTab('signup');
+
+function showTab(t){
+  document.getElementById('tabSignin').classList.toggle('active', t==='signin');
+  document.getElementById('tabSignup').classList.toggle('active', t==='signup');
+  document.getElementById('secSignin').classList.toggle('active', t==='signin');
+  document.getElementById('secSignup').classList.toggle('active', t==='signup');
+}
+
+function setErr(id, msg){ const el=document.getElementById(id); el.textContent=msg; el.className='banner err'; }
+function clearErr(id){ document.getElementById(id).className='banner'; }
+
+async function doSignin(){
+  clearErr('siErr');
+  const email=document.getElementById('siEmail').value.trim();
+  const pw=document.getElementById('siPw').value;
+  if(!email||!pw){ setErr('siErr','Enter email and password.'); return; }
+  document.getElementById('siBtn').disabled=true;
+  try{
+    const r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pw})});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.error||'Login failed.');
+    window.location.href='/';
+  }catch(e){ setErr('siErr',e.message); }
+  finally{ document.getElementById('siBtn').disabled=false; }
+}
+
+async function doSignup(){
+  clearErr('suErr');
+  const name=document.getElementById('suName').value.trim();
+  const email=document.getElementById('suEmail').value.trim();
+  const pw=document.getElementById('suPw').value;
+  if(!name||!email||!pw){ setErr('suErr','All fields are required.'); return; }
+  document.getElementById('suBtn').disabled=true;
+  try{
+    const r=await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password:pw})});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.error||'Registration failed.');
+    window.location.href='/';
+  }catch(e){ setErr('suErr',e.message); }
+  finally{ document.getElementById('suBtn').disabled=false; }
+}
+
+document.addEventListener('keydown', e=>{ if(e.key==='Enter'){ const t=document.getElementById('tabSignin').classList.contains('active')?'doSignin':'doSignup'; window[t](); } });
+
+// Redirect if already logged in
+fetch('/api/auth/me').then(r=>r.json()).then(d=>{ if(d.authenticated) window.location.href='/'; });
+</script>
+</body>
+</html>
